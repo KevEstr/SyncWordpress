@@ -5,10 +5,9 @@ cd /d "%~dp0"
 echo.
 echo ============================================================
 echo   INSTALADOR - Sincronizador Inventario WooCommerce
-echo   Se ejecutara automaticamente 3 veces al dia:
-echo   - 7:00 AM
-echo   - 1:00 PM
-echo   - 7:00 PM
+echo   Se ejecutara automaticamente cada 2 horas:
+echo   - Lunes a Viernes
+echo   - 9:30 AM, 11:30 AM, 1:30 PM, 3:30 PM, 5:30 PM
 echo ============================================================
 echo.
 
@@ -97,26 +96,41 @@ set APP_SCRIPT=%APP_DIR%\sync_inventory.py
 
 echo.
 echo [..] Eliminando tareas programadas anteriores (si existen)...
+schtasks /delete /tn "%TASK_NAME%_930AM" /f >nul 2>&1
+schtasks /delete /tn "%TASK_NAME%_1130AM" /f >nul 2>&1
+schtasks /delete /tn "%TASK_NAME%_130PM" /f >nul 2>&1
+schtasks /delete /tn "%TASK_NAME%_330PM" /f >nul 2>&1
+schtasks /delete /tn "%TASK_NAME%_530PM" /f >nul 2>&1
 schtasks /delete /tn "%TASK_NAME%_7AM" /f >nul 2>&1
 schtasks /delete /tn "%TASK_NAME%_1PM" /f >nul 2>&1
 schtasks /delete /tn "%TASK_NAME%_7PM" /f >nul 2>&1
 echo [OK] Tareas anteriores eliminadas
 
 echo.
-echo [..] Creando tarea programada: 7:00 AM...
-schtasks /create /tn "%TASK_NAME%_7AM" /tr "\"%PYTHON_EXE%\" \"%APP_SCRIPT%\"" /sc daily /st 07:00 /rl highest /f
-if %errorlevel% neq 0 ( echo [ERROR] No se pudo crear tarea 7AM. & pause & exit /b 1 )
-echo [OK] Tarea 7:00 AM creada
+echo [..] Creando tarea programada: 9:30 AM (Lun-Vie)...
+schtasks /create /tn "%TASK_NAME%_930AM" /tr "\"%PYTHON_EXE%\" \"%APP_SCRIPT%\"" /sc weekly /d MON,TUE,WED,THU,FRI /st 09:30 /rl highest /f
+if %errorlevel% neq 0 ( echo [ERROR] No se pudo crear tarea 9:30 AM. & pause & exit /b 1 )
+echo [OK] Tarea 9:30 AM creada
 
-echo [..] Creando tarea programada: 1:00 PM...
-schtasks /create /tn "%TASK_NAME%_1PM" /tr "\"%PYTHON_EXE%\" \"%APP_SCRIPT%\"" /sc daily /st 13:00 /rl highest /f
-if %errorlevel% neq 0 ( echo [ERROR] No se pudo crear tarea 1PM. & pause & exit /b 1 )
-echo [OK] Tarea 1:00 PM creada
+echo [..] Creando tarea programada: 11:30 AM (Lun-Vie)...
+schtasks /create /tn "%TASK_NAME%_1130AM" /tr "\"%PYTHON_EXE%\" \"%APP_SCRIPT%\"" /sc weekly /d MON,TUE,WED,THU,FRI /st 11:30 /rl highest /f
+if %errorlevel% neq 0 ( echo [ERROR] No se pudo crear tarea 11:30 AM. & pause & exit /b 1 )
+echo [OK] Tarea 11:30 AM creada
 
-echo [..] Creando tarea programada: 7:00 PM...
-schtasks /create /tn "%TASK_NAME%_7PM" /tr "\"%PYTHON_EXE%\" \"%APP_SCRIPT%\"" /sc daily /st 19:00 /rl highest /f
-if %errorlevel% neq 0 ( echo [ERROR] No se pudo crear tarea 7PM. & pause & exit /b 1 )
-echo [OK] Tarea 7:00 PM creada
+echo [..] Creando tarea programada: 1:30 PM (Lun-Vie)...
+schtasks /create /tn "%TASK_NAME%_130PM" /tr "\"%PYTHON_EXE%\" \"%APP_SCRIPT%\"" /sc weekly /d MON,TUE,WED,THU,FRI /st 13:30 /rl highest /f
+if %errorlevel% neq 0 ( echo [ERROR] No se pudo crear tarea 1:30 PM. & pause & exit /b 1 )
+echo [OK] Tarea 1:30 PM creada
+
+echo [..] Creando tarea programada: 3:30 PM (Lun-Vie)...
+schtasks /create /tn "%TASK_NAME%_330PM" /tr "\"%PYTHON_EXE%\" \"%APP_SCRIPT%\"" /sc weekly /d MON,TUE,WED,THU,FRI /st 15:30 /rl highest /f
+if %errorlevel% neq 0 ( echo [ERROR] No se pudo crear tarea 3:30 PM. & pause & exit /b 1 )
+echo [OK] Tarea 3:30 PM creada
+
+echo [..] Creando tarea programada: 5:30 PM (Lun-Vie)...
+schtasks /create /tn "%TASK_NAME%_530PM" /tr "\"%PYTHON_EXE%\" \"%APP_SCRIPT%\"" /sc weekly /d MON,TUE,WED,THU,FRI /st 17:30 /rl highest /f
+if %errorlevel% neq 0 ( echo [ERROR] No se pudo crear tarea 5:30 PM. & pause & exit /b 1 )
+echo [OK] Tarea 5:30 PM creada
 
 echo.
 echo.
@@ -125,9 +139,9 @@ echo   INSTALACION COMPLETADA
 echo ============================================================
 echo.
 echo   El sincronizador se ejecutara automaticamente:
-echo     - Todos los dias a las 7:00 AM
-echo     - Todos los dias a la 1:00 PM
-echo     - Todos los dias a las 7:00 PM
+echo     - Lunes a Viernes (NO sabados ni domingos)
+echo     - 9:30 AM, 11:30 AM, 1:30 PM, 3:30 PM, 5:30 PM
+echo     - Total: 5 veces al dia cada 2 horas
 echo.
 echo   Logs de sincronizacion: %APP_DIR%\sync_inventory.log
 echo.
@@ -140,16 +154,20 @@ echo     - Buscar: SyncInventarioWooCommerce
 echo.
 echo   Comandos utiles:
 echo     Ver tareas:
-echo       schtasks /query /tn "%TASK_NAME%_7AM"
-echo       schtasks /query /tn "%TASK_NAME%_1PM"
-echo       schtasks /query /tn "%TASK_NAME%_7PM"
+echo       schtasks /query /tn "%TASK_NAME%_930AM"
+echo       schtasks /query /tn "%TASK_NAME%_1130AM"
+echo       schtasks /query /tn "%TASK_NAME%_130PM"
+echo       schtasks /query /tn "%TASK_NAME%_330PM"
+echo       schtasks /query /tn "%TASK_NAME%_530PM"
 echo.
 echo     Ejecutar ahora (prueba):
-echo       schtasks /run /tn "%TASK_NAME%_7AM"
+echo       schtasks /run /tn "%TASK_NAME%_930AM"
 echo.
 echo     Eliminar tareas:
-echo       schtasks /delete /tn "%TASK_NAME%_7AM" /f
-echo       schtasks /delete /tn "%TASK_NAME%_1PM" /f
-echo       schtasks /delete /tn "%TASK_NAME%_7PM" /f
+echo       schtasks /delete /tn "%TASK_NAME%_930AM" /f
+echo       schtasks /delete /tn "%TASK_NAME%_1130AM" /f
+echo       schtasks /delete /tn "%TASK_NAME%_130PM" /f
+echo       schtasks /delete /tn "%TASK_NAME%_330PM" /f
+echo       schtasks /delete /tn "%TASK_NAME%_530PM" /f
 echo.
 pause
