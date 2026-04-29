@@ -7,7 +7,7 @@ echo ============================================================
 echo   INSTALADOR - Sincronizador Inventario WooCommerce
 echo   Se ejecutara automaticamente cada 2 horas:
 echo   - Lunes a Viernes
-echo   - 9:30 AM, 11:30 AM, 1:30 PM, 3:30 PM, 5:30 PM
+echo   - 10:00 AM, 12:00 PM, 2:00 PM, 4:00 PM, 6:00 PM
 echo ============================================================
 echo.
 
@@ -96,6 +96,11 @@ set APP_SCRIPT=%APP_DIR%\sync_inventory.py
 
 echo.
 echo [..] Eliminando tareas programadas anteriores (si existen)...
+schtasks /delete /tn "%TASK_NAME%_10AM" /f >nul 2>&1
+schtasks /delete /tn "%TASK_NAME%_12PM" /f >nul 2>&1
+schtasks /delete /tn "%TASK_NAME%_2PM" /f >nul 2>&1
+schtasks /delete /tn "%TASK_NAME%_4PM" /f >nul 2>&1
+schtasks /delete /tn "%TASK_NAME%_6PM" /f >nul 2>&1
 schtasks /delete /tn "%TASK_NAME%_930AM" /f >nul 2>&1
 schtasks /delete /tn "%TASK_NAME%_1130AM" /f >nul 2>&1
 schtasks /delete /tn "%TASK_NAME%_130PM" /f >nul 2>&1
@@ -107,30 +112,30 @@ schtasks /delete /tn "%TASK_NAME%_7PM" /f >nul 2>&1
 echo [OK] Tareas anteriores eliminadas
 
 echo.
-echo [..] Creando tarea programada: 9:30 AM (Lun-Vie)...
-schtasks /create /tn "%TASK_NAME%_930AM" /tr "\"%PYTHON_EXE%\" \"%APP_SCRIPT%\"" /sc weekly /d MON,TUE,WED,THU,FRI /st 09:30 /rl highest /f
-if %errorlevel% neq 0 ( echo [ERROR] No se pudo crear tarea 9:30 AM. & pause & exit /b 1 )
-echo [OK] Tarea 9:30 AM creada
+echo [..] Creando tarea programada: 10:00 AM (Lun-Vie)...
+schtasks /create /tn "%TASK_NAME%_10AM" /tr "\"%PYTHON_EXE%\" \"%APP_SCRIPT%\"" /sc weekly /d MON,TUE,WED,THU,FRI /st 10:00 /rl highest /f
+if %errorlevel% neq 0 ( echo [ERROR] No se pudo crear tarea 10:00 AM. & pause & exit /b 1 )
+echo [OK] Tarea 10:00 AM creada
 
-echo [..] Creando tarea programada: 11:30 AM (Lun-Vie)...
-schtasks /create /tn "%TASK_NAME%_1130AM" /tr "\"%PYTHON_EXE%\" \"%APP_SCRIPT%\"" /sc weekly /d MON,TUE,WED,THU,FRI /st 11:30 /rl highest /f
-if %errorlevel% neq 0 ( echo [ERROR] No se pudo crear tarea 11:30 AM. & pause & exit /b 1 )
-echo [OK] Tarea 11:30 AM creada
+echo [..] Creando tarea programada: 12:00 PM (Lun-Vie)...
+schtasks /create /tn "%TASK_NAME%_12PM" /tr "\"%PYTHON_EXE%\" \"%APP_SCRIPT%\"" /sc weekly /d MON,TUE,WED,THU,FRI /st 12:00 /rl highest /f
+if %errorlevel% neq 0 ( echo [ERROR] No se pudo crear tarea 12:00 PM. & pause & exit /b 1 )
+echo [OK] Tarea 12:00 PM creada
 
-echo [..] Creando tarea programada: 1:30 PM (Lun-Vie)...
-schtasks /create /tn "%TASK_NAME%_130PM" /tr "\"%PYTHON_EXE%\" \"%APP_SCRIPT%\"" /sc weekly /d MON,TUE,WED,THU,FRI /st 13:30 /rl highest /f
-if %errorlevel% neq 0 ( echo [ERROR] No se pudo crear tarea 1:30 PM. & pause & exit /b 1 )
-echo [OK] Tarea 1:30 PM creada
+echo [..] Creando tarea programada: 2:00 PM (Lun-Vie)...
+schtasks /create /tn "%TASK_NAME%_2PM" /tr "\"%PYTHON_EXE%\" \"%APP_SCRIPT%\"" /sc weekly /d MON,TUE,WED,THU,FRI /st 14:00 /rl highest /f
+if %errorlevel% neq 0 ( echo [ERROR] No se pudo crear tarea 2:00 PM. & pause & exit /b 1 )
+echo [OK] Tarea 2:00 PM creada
 
-echo [..] Creando tarea programada: 3:30 PM (Lun-Vie)...
-schtasks /create /tn "%TASK_NAME%_330PM" /tr "\"%PYTHON_EXE%\" \"%APP_SCRIPT%\"" /sc weekly /d MON,TUE,WED,THU,FRI /st 15:30 /rl highest /f
-if %errorlevel% neq 0 ( echo [ERROR] No se pudo crear tarea 3:30 PM. & pause & exit /b 1 )
-echo [OK] Tarea 3:30 PM creada
+echo [..] Creando tarea programada: 4:00 PM (Lun-Vie)...
+schtasks /create /tn "%TASK_NAME%_4PM" /tr "\"%PYTHON_EXE%\" \"%APP_SCRIPT%\"" /sc weekly /d MON,TUE,WED,THU,FRI /st 16:00 /rl highest /f
+if %errorlevel% neq 0 ( echo [ERROR] No se pudo crear tarea 4:00 PM. & pause & exit /b 1 )
+echo [OK] Tarea 4:00 PM creada
 
-echo [..] Creando tarea programada: 5:30 PM (Lun-Vie)...
-schtasks /create /tn "%TASK_NAME%_530PM" /tr "\"%PYTHON_EXE%\" \"%APP_SCRIPT%\"" /sc weekly /d MON,TUE,WED,THU,FRI /st 17:30 /rl highest /f
-if %errorlevel% neq 0 ( echo [ERROR] No se pudo crear tarea 5:30 PM. & pause & exit /b 1 )
-echo [OK] Tarea 5:30 PM creada
+echo [..] Creando tarea programada: 6:00 PM (Lun-Vie)...
+schtasks /create /tn "%TASK_NAME%_6PM" /tr "\"%PYTHON_EXE%\" \"%APP_SCRIPT%\"" /sc weekly /d MON,TUE,WED,THU,FRI /st 18:00 /rl highest /f
+if %errorlevel% neq 0 ( echo [ERROR] No se pudo crear tarea 6:00 PM. & pause & exit /b 1 )
+echo [OK] Tarea 6:00 PM creada
 
 echo.
 echo.
@@ -140,7 +145,7 @@ echo ============================================================
 echo.
 echo   El sincronizador se ejecutara automaticamente:
 echo     - Lunes a Viernes (NO sabados ni domingos)
-echo     - 9:30 AM, 11:30 AM, 1:30 PM, 3:30 PM, 5:30 PM
+echo     - 10:00 AM, 12:00 PM, 2:00 PM, 4:00 PM, 6:00 PM
 echo     - Total: 5 veces al dia cada 2 horas
 echo.
 echo   Logs de sincronizacion: %APP_DIR%\sync_inventory.log
@@ -154,20 +159,20 @@ echo     - Buscar: SyncInventarioWooCommerce
 echo.
 echo   Comandos utiles:
 echo     Ver tareas:
-echo       schtasks /query /tn "%TASK_NAME%_930AM"
-echo       schtasks /query /tn "%TASK_NAME%_1130AM"
-echo       schtasks /query /tn "%TASK_NAME%_130PM"
-echo       schtasks /query /tn "%TASK_NAME%_330PM"
-echo       schtasks /query /tn "%TASK_NAME%_530PM"
+echo       schtasks /query /tn "%TASK_NAME%_10AM"
+echo       schtasks /query /tn "%TASK_NAME%_12PM"
+echo       schtasks /query /tn "%TASK_NAME%_2PM"
+echo       schtasks /query /tn "%TASK_NAME%_4PM"
+echo       schtasks /query /tn "%TASK_NAME%_6PM"
 echo.
 echo     Ejecutar ahora (prueba):
-echo       schtasks /run /tn "%TASK_NAME%_930AM"
+echo       schtasks /run /tn "%TASK_NAME%_10AM"
 echo.
 echo     Eliminar tareas:
-echo       schtasks /delete /tn "%TASK_NAME%_930AM" /f
-echo       schtasks /delete /tn "%TASK_NAME%_1130AM" /f
-echo       schtasks /delete /tn "%TASK_NAME%_130PM" /f
-echo       schtasks /delete /tn "%TASK_NAME%_330PM" /f
-echo       schtasks /delete /tn "%TASK_NAME%_530PM" /f
+echo       schtasks /delete /tn "%TASK_NAME%_10AM" /f
+echo       schtasks /delete /tn "%TASK_NAME%_12PM" /f
+echo       schtasks /delete /tn "%TASK_NAME%_2PM" /f
+echo       schtasks /delete /tn "%TASK_NAME%_4PM" /f
+echo       schtasks /delete /tn "%TASK_NAME%_6PM" /f
 echo.
 pause
