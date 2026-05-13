@@ -11,12 +11,12 @@ from typing import Dict, List, Optional
 import time
 
 # Configuración
-API_INVENTARIO_URL = "https://pub-9bee73921e1747228cd3ef3cfe689273.r2.dev/inventario.json"
+API_INVENTARIO_URL = "https://pub-28f7c6a4078f46358c37d14e08c51abe.r2.dev/inventario.json"
 
 # Configuración WordPress/WooCommerce
-WP_URL = "https://nicolpruebas-grupo30.online"  # Tu URL de WordPress
-WP_API_KEY = "ck_2704c52a6f5ec53dbd2b7327f9dd7e24c84b93ba"  # Cambiar por tu consumer key
-WP_API_SECRET = "cs_baf22afd3062d9503fb243b32c30ce92d9755bc0"  # Cambiar por tu consumer secret
+WP_URL = "https://siriusperfumeria.com"  # Tu URL de WordPress
+WP_API_KEY = "ck_929898302ba1c9625cb21fa7692822e22c7517d0"  # Cambiar por tu consumer key
+WP_API_SECRET = "cs_e1bf4ee45674666a29f230793ca463dfc30df323"  # Cambiar por tu consumer secret
 
 # Configuración de logging
 logging.basicConfig(
@@ -55,11 +55,11 @@ class InventorySync:
             data = response.json()
             productos = data.get('data', [])
             
-            # Crear diccionario indexado por SKU (código)
+            # Crear diccionario indexado por SKU (código largo)
             inventario = {}
             for producto in productos:
                 if producto.get('activo', False):
-                    sku = producto.get('codigo', '').strip()
+                    sku = producto.get('cod_largo', '').strip()
                     if sku:
                         inventario[sku] = {
                             'stock': int(producto.get('disponible', 0)),
