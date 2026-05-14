@@ -19,15 +19,24 @@ WP_API_KEY = "ck_929898302ba1c9625cb21fa7692822e22c7517d0"  # Cambiar por tu con
 WP_API_SECRET = "cs_e1bf4ee45674666a29f230793ca463dfc30df323"  # Cambiar por tu consumer secret
 
 # Configuración de logging
+import sys
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('sync_inventory.log'),
-        logging.StreamHandler()
+        logging.FileHandler('sync_inventory.log', encoding='utf-8'),
+        logging.StreamHandler(sys.stdout)
     ]
 )
 logger = logging.getLogger(__name__)
+
+# Configurar stdout para UTF-8 en Windows
+if sys.platform == 'win32':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
 
 
 class InventorySync:
@@ -45,6 +54,29 @@ class InventorySync:
             'no_encontrados': 0
         }
     
+    def _parse_numero(self, valor) -> float:
+        """Convierte un valor a float, manejando strings con coma o punto decimal."""
+        if valor is None:
+            return 0.0
+        if isinstance(valor, (int, float)):
+            return float(valor)
+        if isinstance(valor, str):
+            # Reemplazar coma decimal por punto
+            valor_limpio = valor.strip().replace(',', '.')
+            try:
+                return float(valor_limpio)
+            except ValueError:
+                return 0.0
+        return 0.0
+    
+    def _formatear_precio(self, precio: float) -> str:
+        """Formatea el precio para WooCommerce (con punto decimal, sin separadores de miles)."""
+        # WooCommerce espera el precio como string con punto decimal
+        # Si es un numero entero, no agregar decimales
+        if precio == int(precio):
+            return str(int(precio))
+        return f"{precio:.2f}"
+    
     def obtener_inventario_api(self) -> Dict[str, Dict]:
         """Obtiene el inventario completo de la API externa."""
         try:
@@ -59,11 +91,11 @@ class InventorySync:
             inventario = {}
             for producto in productos:
                 if producto.get('activo', False):
-                    sku = producto.get('cod_largo', '').strip()
+                    sku = str(producto.get('cod_largo', '')).strip()
                     if sku:
                         inventario[sku] = {
-                            'stock': int(producto.get('disponible', 0)),
-                            'precio': float(producto.get('precio_venta_1', 0)),
+                            'stock': int(self._parse_numero(producto.get('disponible', 0))),
+                            'precio': self._parse_numero(producto.get('precio_venta_1', 0)),
                             'descripcion': producto.get('descripcion', '')
                         }
             
@@ -178,7 +210,7 @@ class InventorySync:
         # Comparar y actualizar si es necesario
         datos_api = inventario_api[sku]
         stock_wp = producto.get('stock_quantity', 0) or 0
-        precio_wp = float(producto.get('regular_price', 0) or 0)
+        precio_wp = self._parse_numero(producto.get('regular_price', 0))
         
         stock_api = datos_api['stock']
         precio_api = datos_api['precio']
@@ -191,21 +223,21 @@ class InventorySync:
             cambios['stock_quantity'] = stock_api
             cambios['manage_stock'] = True
             necesita_actualizacion = True
-            logger.info(f"SKU {sku}: Stock {stock_wp} → {stock_api}")
+            logger.info(f"SKU {sku}: Stock {stock_wp} -> {stock_api}")
         
         # Verificar precio
         if abs(precio_wp - precio_api) > 0.01:
-            cambios['regular_price'] = str(precio_api)
+            cambios['regular_price'] = self._formatear_precio(precio_api)
             necesita_actualizacion = True
-            logger.info(f"SKU {sku}: Precio {precio_wp} → {precio_api}")
+            logger.info(f"SKU {sku}: Precio {precio_wp} -> {precio_api} (enviado: {cambios['regular_price']})")
         
         # Actualizar si hay cambios
         if necesita_actualizacion:
             if self.actualizar_producto_wordpress(producto_id, cambios):
-                logger.info(f"✓ Producto {sku} actualizado exitosamente")
+                logger.info(f"[OK] Producto {sku} actualizado exitosamente")
                 self.stats['actualizados'] += 1
             else:
-                logger.error(f"✗ Error al actualizar producto {sku}")
+                logger.error(f"[ERROR] Error al actualizar producto {sku}")
                 self.stats['errores'] += 1
         else:
             self.stats['sin_cambios'] += 1
